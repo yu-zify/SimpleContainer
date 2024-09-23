@@ -41,6 +41,9 @@ public class DashboardFragment extends Fragment {
         Button enter=binding.enter;
         ScrollView scrollView=binding.scroll;
 
+        getActivity().runOnUiThread(()->{
+            show.setText("");
+        });
 
         enter.setOnClickListener(view -> {
             new Thread(() -> {

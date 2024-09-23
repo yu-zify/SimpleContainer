@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void firstSet(String okFilePath){
         try {
-            String[] files = {"core.tar","start.sh","busybox","libbusybox.so.1.36.1","install.sh"};
+            String[] files = {"core","start.sh","busybox","libbusybox.so.1.36.1","install.sh"};
             AssetManager assetManager = getAssets();
             String[] fil = assetManager.list("");
             //System.out.println(fil);

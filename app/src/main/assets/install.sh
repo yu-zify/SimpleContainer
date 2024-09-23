@@ -9,10 +9,13 @@ fi
 pam=$1
 
 if [ "$pam" == "1" ]; then
-	LD_PRELOAD=$WHOME/libbusybox.so.1.36.1 $WHOME/busybox tar -xvf $WHOME/core.tar -C $WHOME
+	LD_PRELOAD=$WHOME/libbusybox.so.1.36.1 $WHOME/busybox tar -xvf $WHOME/core -C $WHOME
 	echo 1
 elif [ "$pam" == "2" ]; then
-	LD_PRELOAD=$WHOME/libbusybox.so.1.36.1 $WHOME/busybox tar -zxvf /sdcard/Download/debian_xfce.tar.gz -C $WHOME
+  if test -f /sdcard/Download/debian_xfce.tar.gz ; then
+    mv /sdcard/Download/debian_xfce.tar.gz $WHOME
+  fi
+	LD_PRELOAD=$WHOME/libbusybox.so.1.36.1 $WHOME/busybox tar -zxvf $WHOME/debian_xfce.tar.gz -C $WHOME
 	echo 2
 fi
 echo ok
