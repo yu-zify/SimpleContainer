@@ -80,7 +80,7 @@ public class HomeFragment extends Fragment {
             createButton.setEnabled(createBtn);
         }else {
             createButton.setOnClickListener(view -> {
-                String fileUrl = "https://github.com/yu-zify/simple_rootfs/releases/download/rootfs/debian_xfce.tar.gz";
+                String fileUrl = "https://github.com/yu-zify/simple_rootfs/releases/download/rootfs/extra.tar.gz";
                 String savePath = privateDir;
 
                 AlertDialog dialogGet = new AlertDialog.Builder(getActivity())
@@ -88,7 +88,6 @@ public class HomeFragment extends Fragment {
                         .setMessage("选择获取rootfs方式，如选择本地请把文件命名为debian_xfce.tar.gz放入Download目录，在线下载地址：\n https://github.com/yu-zify/simple_rootfs/releases/download/rootfs/debian_xfce.tar.gz")
                         .setPositiveButton("在线下载", (dialog1, which) -> {
                             download(fileUrl,savePath);
-                            installRootfs();
                         })
                         .setNegativeButton("本地", (dialog12, which) -> {
                             File rootfs_file = new File("/sdcard/Download/debian_xfce.tar.gz");
@@ -166,21 +165,23 @@ public class HomeFragment extends Fragment {
     }
 
     public void installRootfs(){
+        System.out.println("开始安装");
         Activity activity = requireActivity();
         String privateDir = activity.getFilesDir().getAbsolutePath();
         String cmd = privateDir + "/install.sh 2";
         //RunCmd.runcmd(cmd);
-
+        System.out.println("开始安装2");
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(getLayoutInflater().inflate(R.layout.progress_dialog, null));
         builder.setCancelable(false); //禁用取消功能
         builder.setMessage("解压中。。。");
         AlertDialog dialog = builder.create();
         dialog.show();
-
+        System.out.println("开始安装3");
         Button createButton=binding.create;
         File container_test = new File(privateDir+"/test");
         ExecutorService executor = Executors.newSingleThreadExecutor();
+        System.out.println("开始安装4");
         executor.execute(() -> {
             try {
                 System.out.println("解压");
@@ -269,8 +270,9 @@ public class HomeFragment extends Fragment {
                 //System.out.println(fileSize);
                 //System.out.println("下载2");
                 InputStream inputStream = connection.getInputStream();
-                FileOutputStream outputStream = new FileOutputStream(new File(savePath, "debian_xfce.tar.gz"));
-
+                FileOutputStream outputStream = new FileOutputStream(new File(savePath, "debian_xfce.tar.gz.tmp"));
+                File file=new File(savePath+"/debian_xfce.tar.gz.tmp");
+                File newFile=new File(savePath+"/debian_xfce.tar.gz");
                 byte[] buffer = new byte[4096];
                 int bytesRead;
                 int totalBytesRead = 0;
@@ -278,10 +280,14 @@ public class HomeFragment extends Fragment {
 
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
                     outputStream.write(buffer, 0, bytesRead);
+                    //System.out.println("byte:"+bytesRead);
                     totalBytesRead += bytesRead;
+                    //System.out.println("total:"+totalBytesRead);
+                    //System.out.println("all:"+fileSize);
 
                     // 计算下载进度
-                    int progress = (int) ((totalBytesRead * 100) / fileSize);
+                    int progress = (int) ((file.length() * 100) / fileSize);
+
 
                     // 更新UI（可以使用Handler或者runOnUiThread方法更新UI）
                     getActivity().runOnUiThread(() -> {
@@ -294,15 +300,23 @@ public class HomeFragment extends Fragment {
                 inputStream.close();
                 connection.disconnect();
 
+                newFile.delete();
+                Boolean s=file.renameTo(newFile);
+                if(s){
+                    System.out.println("重命名成功");
+                }else {
+                    System.out.println("重命名失败");
+                }
+
+                dialog.dismiss();
                 System.out.println("File downloaded successfully.");
+                installRootfs();
             }catch (Exception e){
 
             }
         }).start();
 
     }
-
-
 
 
     @Override
