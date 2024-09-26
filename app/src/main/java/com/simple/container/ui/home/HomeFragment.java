@@ -1,20 +1,13 @@
 package com.simple.container.ui.home;
 
 import android.app.Activity;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.AssetManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,25 +17,19 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.simple.container.MainActivity;
 import com.simple.container.NovncActivity;
 import com.simple.container.R;
-import com.simple.container.RunCmd;
 import com.simple.container.databinding.FragmentHomeBinding;
 import com.simple.container.services.pulseServer;
 import com.simple.container.services.startProot;
 import com.simple.container.services.virglServer;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -80,20 +67,44 @@ public class HomeFragment extends Fragment {
             createButton.setEnabled(createBtn);
         }else {
             createButton.setOnClickListener(view -> {
-                String fileUrl = "https://github.com/yu-zify/simple_rootfs/releases/download/rootfs/extra.tar.gz";
+                String fileUrl = "https://github.com/yu-zify/simple_rootfs/releases/download/rootfs/debian_xfce.tar.gz";
                 String savePath = privateDir;
 
                 AlertDialog dialogGet = new AlertDialog.Builder(getActivity())
                         .setTitle("获取rootfs")
-                        .setMessage("选择获取rootfs方式，如选择本地请把文件命名为debian_xfce.tar.gz放入Download目录，在线下载地址：\n https://github.com/yu-zify/simple_rootfs/releases/download/rootfs/debian_xfce.tar.gz")
+                        //.setView(R.layout.progress_dialog))
+                        .setMessage("选择获取rootfs方式，如选择本地请把文件命名为debian_xfce.tar.gz放入Download目录，在线下载地址：\n " +
+                                "https://github.com/yu-zify/simple_rootfs/releases/download/rootfs/debian_xfce.tar.gz")
                         .setPositiveButton("在线下载", (dialog1, which) -> {
-                            download(fileUrl,savePath);
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                            builder.setView(getLayoutInflater().inflate(R.layout.get_rootfs, null));
+                            builder.setCancelable(false); //禁用取消功能
+                            builder.setMessage("下载中。。。");
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+
+                            ExecutorService executor = Executors.newSingleThreadExecutor();
+                            executor.execute(()->{
+                            downloadAndInstall(fileUrl,savePath,dialog);
+                            });
+                            executor.shutdown();
                         })
                         .setNegativeButton("本地", (dialog12, which) -> {
                             File rootfs_file = new File("/sdcard/Download/debian_xfce.tar.gz");
                             if (rootfs_file.exists() && !rootfs_file.isDirectory()) {
                                 System.out.println("发现文件");
-                                installRootfs();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                builder.setView(getLayoutInflater().inflate(R.layout.get_rootfs, null));
+                                builder.setCancelable(false); //禁用取消功能
+                                builder.setMessage("解压中。。。");
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+
+                                ExecutorService executor = Executors.newSingleThreadExecutor();
+                                executor.execute(()->{
+                                    installRootfs(dialog);
+                                });
+                                executor.shutdown();
                             } else {
                                 System.out.println("文件不存在");
 
@@ -164,25 +175,26 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
-    public void installRootfs(){
-        System.out.println("开始安装");
+    public void installRootfs(AlertDialog dialog){
+        //System.out.println("开始安装");
         Activity activity = requireActivity();
         String privateDir = activity.getFilesDir().getAbsolutePath();
         String cmd = privateDir + "/install.sh 2";
         //RunCmd.runcmd(cmd);
-        System.out.println("开始安装2");
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setView(getLayoutInflater().inflate(R.layout.progress_dialog, null));
-        builder.setCancelable(false); //禁用取消功能
-        builder.setMessage("解压中。。。");
-        AlertDialog dialog = builder.create();
-        dialog.show();
-        System.out.println("开始安装3");
+        //System.out.println("开始安装2");
+        //AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        //builder.setView(getLayoutInflater().inflate(R.layout.progress_dialog, null));
+       // builder.setCancelable(false); //禁用取消功能
+        //dialog.setMessage("解压中。。。");
+        //AlertDialog dialog = builder.create();
+        //dialog.show();
+
+        //System.out.println("开始安装3");
         Button createButton=binding.create;
         File container_test = new File(privateDir+"/test");
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        System.out.println("开始安装4");
-        executor.execute(() -> {
+        //ExecutorService executor = Executors.newSingleThreadExecutor();
+        //System.out.println("开始安装4");
+        //executor.execute(() -> {
             try {
                 System.out.println("解压");
                 ProcessBuilder pb = new ProcessBuilder("/bin/sh","-c",cmd+" > /data/user/0/com.simple.container/files/out");
@@ -203,8 +215,7 @@ public class HomeFragment extends Fragment {
                     dialog.dismiss(); // 出现异常时关闭对话框
                 });
             }
-        });
-        executor.shutdown();
+       // executor.shutdown();
 //                new AsyncTask<Void, Void, Void>() {
 //                    @Override
 //                    protected Void doInBackground(Void... voids) {
@@ -251,16 +262,9 @@ public class HomeFragment extends Fragment {
 
     }
 
-    public void download(String fileUrl,String savePath){
+    public void downloadAndInstall(String fileUrl, String savePath, AlertDialog dialog){
         //String fileUrl = "https://example.com/file.txt";
         //String savePath = "/sdcard";
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setView(getLayoutInflater().inflate(R.layout.get_rootfs, null));
-        builder.setCancelable(false); //禁用取消功能
-        builder.setMessage("下载中。。。");
-        AlertDialog dialog = builder.create();
-        dialog.show();
-        new Thread(()->{
             try {
                 URL url = new URL(fileUrl);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -308,14 +312,30 @@ public class HomeFragment extends Fragment {
                     System.out.println("重命名失败");
                 }
 
-                dialog.dismiss();
+           //     dialog.dismiss();
                 System.out.println("File downloaded successfully.");
-                installRootfs();
-            }catch (Exception e){
+                //dialog.setView();
+                getActivity().runOnUiThread(() -> {
+                    dialog.setMessage("安装中");
+                });
+                installRootfs(dialog);
 
-            }
-        }).start();
-
+            }catch (Exception ignored){}
+//        while(true){
+//            try{
+//                if(executor.awaitTermination(1, TimeUnit.SECONDS)){
+//                    break;
+//                }
+//            } catch (InterruptedException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
+//        try {
+//            thread.join();
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+        //installRootfs();
     }
 
 
