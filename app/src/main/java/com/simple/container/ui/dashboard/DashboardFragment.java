@@ -48,7 +48,8 @@ public class DashboardFragment extends Fragment {
         enter.setOnClickListener(view -> {
             new Thread(() -> {
                 String inputText=input.getText().toString();
-                ProcessBuilder pb = new ProcessBuilder("/bin/sh", "-c", inputText);
+                String env="cd /data/data/com.simple.container/files ; ";
+                ProcessBuilder pb = new ProcessBuilder("/bin/sh", "-c", env + inputText);
                 System.out.println(inputText);
                 pb.redirectErrorStream(true);
                 try {
@@ -66,7 +67,6 @@ public class DashboardFragment extends Fragment {
                         });
 
                     }
-
                     // 等待命令执行完成
                     int exitCode = process.waitFor();
                     System.out.println("Command exit code: " + exitCode);

@@ -57,7 +57,6 @@ public class HomeFragment extends Fragment {
 
         Activity activity = requireActivity();
         String privateDir = activity.getFilesDir().getAbsolutePath();
-        //System.out.println(filesDir+"____fragment");
 
 // 真正创建容器
         Button createButton=binding.create;
@@ -176,25 +175,11 @@ public class HomeFragment extends Fragment {
     }
 
     public void installRootfs(AlertDialog dialog){
-        //System.out.println("开始安装");
         Activity activity = requireActivity();
         String privateDir = activity.getFilesDir().getAbsolutePath();
         String cmd = privateDir + "/install.sh 2";
-        //RunCmd.runcmd(cmd);
-        //System.out.println("开始安装2");
-        //AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        //builder.setView(getLayoutInflater().inflate(R.layout.progress_dialog, null));
-       // builder.setCancelable(false); //禁用取消功能
-        //dialog.setMessage("解压中。。。");
-        //AlertDialog dialog = builder.create();
-        //dialog.show();
-
-        //System.out.println("开始安装3");
         Button createButton=binding.create;
         File container_test = new File(privateDir+"/test");
-        //ExecutorService executor = Executors.newSingleThreadExecutor();
-        //System.out.println("开始安装4");
-        //executor.execute(() -> {
             try {
                 System.out.println("解压");
                 ProcessBuilder pb = new ProcessBuilder("/bin/sh","-c",cmd+" > /data/user/0/com.simple.container/files/out");
@@ -215,52 +200,9 @@ public class HomeFragment extends Fragment {
                     dialog.dismiss(); // 出现异常时关闭对话框
                 });
             }
-       // executor.shutdown();
-//                new AsyncTask<Void, Void, Void>() {
-//                    @Override
-//                    protected Void doInBackground(Void... voids) {
-//                        try {
-//                            ProcessBuilder pb = new ProcessBuilder("/bin/sh","-c",cmd+" > /data/user/0/com.simple.container/files/out");
-//                            Process process = pb.start();
-//                            int exitCode = process.waitFor(); // 等待进程执行完毕
-//                        } catch (IOException | InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
-//                        return null;
-//                    }
-//
-//                    @Override
-//                    protected void onPostExecute(Void aVoid) {
-//                        if(container_test.exists() && container_test.isDirectory()){
-//                            createBtn = false;
-//                            createButton.setEnabled(createBtn);
-//                        } else {
-//                            System.out.println("创建失败");
-//                        }
-//                        dialog.dismiss(); // 进程执行完毕后关闭对话框
-//                    }
-//                }.execute();
-
-//                ProcessBuilder pb = new ProcessBuilder("/bin/sh","-c",cmd+" > /data/user/0/com.simple.container/files/out");
-//
-//                Process ps= null;
-//                try {
-//                    ps = pb.start();
-//                    dialog.dismiss();
-//                    if(container_test.exists() && container_test.isDirectory()) {
-//                        createBtn = false;
-//                        createButton.setEnabled(createBtn);
-//                    }else {
-//                        System.out.println("创建失败");
-//                    }
-//                } catch (IOException e) {
-//                    throw new RuntimeException(e);
-//                }
     }
 
-    public void getRootfsBtn2(){
 
-    }
 
     public void downloadAndInstall(String fileUrl, String savePath, AlertDialog dialog){
         //String fileUrl = "https://example.com/file.txt";
@@ -279,19 +221,11 @@ public class HomeFragment extends Fragment {
                 File newFile=new File(savePath+"/debian_xfce.tar.gz");
                 byte[] buffer = new byte[4096];
                 int bytesRead;
-                int totalBytesRead = 0;
-                //System.out.println("下载3");
 
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
                     outputStream.write(buffer, 0, bytesRead);
-                    //System.out.println("byte:"+bytesRead);
-                    totalBytesRead += bytesRead;
-                    //System.out.println("total:"+totalBytesRead);
-                    //System.out.println("all:"+fileSize);
-
                     // 计算下载进度
                     int progress = (int) ((file.length() * 100) / fileSize);
-
 
                     // 更新UI（可以使用Handler或者runOnUiThread方法更新UI）
                     getActivity().runOnUiThread(() -> {
@@ -321,21 +255,6 @@ public class HomeFragment extends Fragment {
                 installRootfs(dialog);
 
             }catch (Exception ignored){}
-//        while(true){
-//            try{
-//                if(executor.awaitTermination(1, TimeUnit.SECONDS)){
-//                    break;
-//                }
-//            } catch (InterruptedException e) {
-//                throw new RuntimeException(e);
-//            }
-//        }
-//        try {
-//            thread.join();
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
-        //installRootfs();
     }
 
 

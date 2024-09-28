@@ -6,6 +6,10 @@ if  test ! -d $WHOME/tmp ; then
   mkdir $WHOME/tmp
 fi
 
+if  test ! -d $WHOME/extra ; then
+  mkdir $WHOME/extra
+fi
+
 pam=$1
 
 if [ "$pam" == "1" ]; then
@@ -17,5 +21,7 @@ elif [ "$pam" == "2" ]; then
   fi
 	LD_PRELOAD=$WHOME/libbusybox.so.1.36.1 $WHOME/busybox tar -zxvf $WHOME/debian_xfce.tar.gz -C $WHOME
 	echo 2
+elif [ "$pam" == "3" ]; then
+  LD_PRELOAD=$WHOME/libbusybox.so.1.36.1 $WHOME/busybox tar -zxvf $WHOME/extra/extra.tar.gz -C $WHOME/test
 fi
 echo ok
