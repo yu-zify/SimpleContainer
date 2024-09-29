@@ -59,11 +59,11 @@
             android:layout_height="wrap_content"
             android:text="显示novnc" />
 
-        <Button
-            android:id="@+id/button_test"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="测试按钮" />
+<!--        <Button-->
+<!--            android:id="@+id/button_test"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="测试按钮" />-->
 
         <ProgressBar
             android:id="@+id/progressBar"

@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.simple.container.R;
+import com.simple.container.RunCmd;
 import com.simple.container.databinding.FragmentNotificationsBinding;
 
 import java.io.File;
@@ -76,9 +77,22 @@ public class NotificationsFragment extends Fragment {
                         String savePath = getActivity().getFilesDir().getAbsolutePath()+"/extra";
                         String fileName="extra.tar.gz";
                         downloadAndInstall(fileUrl,savePath,fileName,dialog);
+                        try {
+                            String sed_cmd="s|Xvnc|/opt/dri3vnc/bin/&|g";
+                            RunCmd.runcmd("sed -i '" +sed_cmd+ "' /data/data/com.simple.container/files/start.sh");
+                        } catch (IOException | InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+
                     }else if(num==0&&witch==1){
                         System.out.println("xxxxx01");
-
+                        try {
+                            String sed_cmd="s|/opt/dri3vnc/bin/||g";
+                            RunCmd.runcmd("sed -i '" +sed_cmd+ "' /data/data/com.simple.container/files/start.sh");
+                        } catch (IOException | InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                        dialog.dismiss();
                     }else if(num==1&&witch==0){
                         System.out.println("xxxxx10");
                     }else if(num==1&&witch==1){

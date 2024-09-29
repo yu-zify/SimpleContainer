@@ -35,7 +35,7 @@ import java.util.concurrent.Executors;
 
 public class HomeFragment extends Fragment {
 
-    private boolean testBtn = true;
+   // private boolean testBtn = true;
     private boolean createBtn=true;
     private boolean startBtn=true;
     private boolean soundBtn=true;
@@ -121,7 +121,8 @@ public class HomeFragment extends Fragment {
         startButton.setOnClickListener(view -> {
             startBtn=false;
             startButton.setEnabled(startBtn);
-            String cmd = privateDir+"/start.sh";
+            //String args="service dbus start ; Xvnc :0 -SecurityTypes=none & PULSE_SERVER=127.0.0.1 DISPLAY=:0 xfce4-session & /root/noVNC/utils/novnc_proxy --vnc localhost:5900 & while true ; do echo 1; sleep 1 ; done";
+            String cmd = privateDir+"/start.sh ";
             Intent intent = new Intent(requireActivity(), startProot.class);
             intent.putExtra("key1", cmd);
             requireActivity().startService(intent);
@@ -156,7 +157,7 @@ public class HomeFragment extends Fragment {
             Intent intent = new Intent(requireActivity(), NovncActivity.class);
             startActivity(intent);
         });
-
+/*
         Button btn=binding.buttonTest;
         btn.setEnabled(testBtn);
         btn.setOnClickListener(view -> {
@@ -170,7 +171,7 @@ public class HomeFragment extends Fragment {
             btn.setEnabled(testBtn);
             Toast.makeText(requireContext(), "Button clicked!", Toast.LENGTH_SHORT).show();
         });
-
+*/
         return root;
     }
 
@@ -202,8 +203,6 @@ public class HomeFragment extends Fragment {
             }
     }
 
-
-
     public void downloadAndInstall(String fileUrl, String savePath, AlertDialog dialog){
         //String fileUrl = "https://example.com/file.txt";
         //String savePath = "/sdcard";
@@ -211,10 +210,8 @@ public class HomeFragment extends Fragment {
                 URL url = new URL(fileUrl);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
-                //System.out.println("下载1");
+
                 int fileSize = connection.getContentLength();
-                //System.out.println(fileSize);
-                //System.out.println("下载2");
                 InputStream inputStream = connection.getInputStream();
                 FileOutputStream outputStream = new FileOutputStream(new File(savePath, "debian_xfce.tar.gz.tmp"));
                 File file=new File(savePath+"/debian_xfce.tar.gz.tmp");
@@ -261,7 +258,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean("testButton_enabled", testBtn);
+     //   outState.putBoolean("testButton_enabled", testBtn);
         outState.putBoolean("createButton_enabled", createBtn);
         outState.putBoolean("startButton_enabled", startBtn);
         outState.putBoolean("soundButton_enabled", soundBtn);
@@ -272,7 +269,7 @@ public class HomeFragment extends Fragment {
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
         if (savedInstanceState != null) {
-            testBtn = savedInstanceState.getBoolean("testButton_enabled");
+            //testBtn = savedInstanceState.getBoolean("testButton_enabled");
             createBtn = savedInstanceState.getBoolean("createButton_enabled");
             startBtn = savedInstanceState.getBoolean("startButton_enabled");
             soundBtn = savedInstanceState.getBoolean("soundButton_enabled");
