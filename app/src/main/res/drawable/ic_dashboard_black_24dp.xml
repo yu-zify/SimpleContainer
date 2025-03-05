@@ -3,7 +3,19 @@
     android:height="24dp"
     android:viewportWidth="24.0"
     android:viewportHeight="24.0">
+    <!-- 绘制正方形 -->
     <path
-        android:fillColor="#FF000000"
-        android:pathData="M3,13h8L11,3L3,3v10zM3,21h8v-6L3,15v6zM13,21h8L21,11h-8v10zM13,3v6h8L21,3h-8z" />
+        android:strokeColor="#000000"
+        android:strokeWidth="2"
+        android:pathData="M2,2 L22,2 L22,22 L2,22 Z" /> <!-- 正方形 -->
+
+    <!-- 绘制大于号 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,12 L5,6 L5,18 Z" /> <!-- 大于号 -->
+
+    <!-- 绘制横线 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,18 L12,16 L18,16 L18,18 Z" /> <!-- 横线 -->
 </vector>

@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Build;
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint({"SetWorldWritable", "SetWorldReadable"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         super.onCreate(savedInstanceState);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -71,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
-            System.out.println("sqcc");
+            //System.out.println("sqcc");
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_STORAGE_PERMISSION);
         }
@@ -149,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private boolean isNotificationPermissionGranted() {
-        NotificationManager manager = (NotificationManager) getSystemService(NotificationManager.class);
+        NotificationManager manager = getSystemService(NotificationManager.class);
         return manager.areNotificationsEnabled();
     }
 

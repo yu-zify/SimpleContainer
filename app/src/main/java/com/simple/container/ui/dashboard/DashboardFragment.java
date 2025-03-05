@@ -70,7 +70,7 @@ public class DashboardFragment extends Fragment {
                     // 等待命令执行完成
                     int exitCode = process.waitFor();
                     System.out.println("Command exit code: " + exitCode);
-                    getActivity().runOnUiThread(() -> show.setText(show.getText()+"\n"+"Command exit code: " + exitCode ));
+                    getActivity().runOnUiThread(() -> show.setText("container >> "+show.getText()+"\n"+"Command exit code: " + exitCode ));
                 } catch (IOException | InterruptedException e) {
                     throw new RuntimeException(e);
                 }

@@ -10,6 +10,8 @@ import android.os.IBinder;
 
 import androidx.core.app.NotificationCompat;
 
+import com.simple.container.R;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -87,6 +89,7 @@ public class startProot extends Service {
 
         return START_STICKY;
     }
+
 
     @Override
     public void onDestroy() {
