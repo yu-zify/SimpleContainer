@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.simple.container.databinding.FragmentDashboardBinding;
 
@@ -39,13 +40,16 @@ public class DashboardFragment extends Fragment {
         TextView show=binding.shellShow;
         EditText input=binding.shellEdit;
         Button enter=binding.enter;
-        ScrollView scrollView=binding.scroll;
-
-        getActivity().runOnUiThread(()->{
-            show.setText("");
-        });
+        ScrollView scrollView=binding.sv;
+//显示第一个container>>
+        if(isAdded()) {
+            getActivity().runOnUiThread(() -> show.setText("container >> "));
+        }
 
         enter.setOnClickListener(view -> {
+            if(isAdded()) {
+                getActivity().runOnUiThread(() -> show.setText(show.getText()+input.getText().toString()));
+            }
             new Thread(() -> {
                 String inputText=input.getText().toString();
                 String env="cd /data/data/com.simple.container/files ; ";
@@ -58,19 +62,28 @@ public class DashboardFragment extends Fragment {
                     // 获取合并后的输出流
                     BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                     String line;
+
                     while ((line = reader.readLine()) != null) {
                         System.out.println(line);
                         String finalLine = line;
-                        getActivity().runOnUiThread(()->{
-                            show.setText(show.getText()+"\n"+ finalLine);
-                            scrollView.smoothScrollTo(0, show.getBottom());
-                        });
-
+                        if(isAdded()) {
+                            getActivity().runOnUiThread(() -> {
+                                show.setText(show.getText() + "\n" + finalLine);
+                                scrollView.smoothScrollTo(0,scrollView.getScrollY());
+                            });
+                        }
                     }
                     // 等待命令执行完成
                     int exitCode = process.waitFor();
                     System.out.println("Command exit code: " + exitCode);
-                    getActivity().runOnUiThread(() -> show.setText("container >> "+show.getText()+"\n"+"Command exit code: " + exitCode ));
+                    if(isAdded()) {
+                        getActivity().runOnUiThread(() -> show.setText(show.getText()
+                                + "\n" + "Command exit code: "
+                                + exitCode
+                                + "\ncontainer >> "));
+                        scrollView.smoothScrollTo(0,scrollView.getScrollY());
+                    }
+
                 } catch (IOException | InterruptedException e) {
                     throw new RuntimeException(e);
                 }

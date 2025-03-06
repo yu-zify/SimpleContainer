@@ -1,5 +1,6 @@
 package com.simple.container.ui.home;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -44,6 +45,7 @@ public class HomeFragment extends Fragment {
    // private boolean novncBtn=true;
     private FragmentHomeBinding binding;
 
+    @SuppressLint("SuspiciousIndentation")
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         HomeViewModel homeViewModel =
@@ -118,6 +120,8 @@ public class HomeFragment extends Fragment {
 
         Button startButton=binding.start;
         startButton.setEnabled(startBtn);
+        if(startBtn)
+        startButton.setText("正在运行");
         startButton.setOnClickListener(view -> {
             startBtn=false;
             startButton.setEnabled(startBtn);
@@ -283,5 +287,33 @@ public class HomeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+
+    public String count_container_size(String container_home){
+        File f=new File(container_home);
+        long size;
+        size=getFolderSize(f);
+        return String.valueOf(size);
+    }
+
+    public long getFolderSize(File rootfs){
+        long size=0;
+        if (rootfs.isDirectory()) {
+            // 获取文件夹中的文件和子目录
+            File[] files = rootfs.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    // 如果是文件，累加其大小
+                    if (file.isFile()) {
+                        size += file.length();
+                    } else if (file.isDirectory()) {
+                        // 如果是目录，递归调用
+                        size += getFolderSize(file);
+                    }
+                }
+            }
+        }
+        return size;
     }
 }
