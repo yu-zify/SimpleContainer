@@ -1,5 +1,5 @@
 一个proot启动器
-运行Debian12 arm64
+运行Debian sid arm64
 
 通过proot进入liux环境以运行linux pc 应用程序
 可通过box64 + wine 运行windows 应用程序
