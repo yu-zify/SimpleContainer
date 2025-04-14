@@ -78,9 +78,9 @@ public class DashboardFragment extends Fragment {
                     System.out.println("Command exit code: " + exitCode);
                     if(isAdded()) {
                         getActivity().runOnUiThread(() -> show.setText(show.getText()
-                                + "\n" + "Command exit code: "
+                                + "\n" + "       [Command exit code: "
                                 + exitCode
-                                + "\ncontainer >> "));
+                                + "]\ncontainer >> "));
                         scrollView.smoothScrollTo(0,scrollView.getScrollY());
                     }
 

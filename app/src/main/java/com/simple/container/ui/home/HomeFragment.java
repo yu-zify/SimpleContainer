@@ -1,16 +1,17 @@
 package com.simple.container.ui.home;
 
+import static java.lang.Thread.sleep;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,6 +19,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.gson.Gson;
 import com.simple.container.NovncActivity;
 import com.simple.container.R;
 import com.simple.container.databinding.FragmentHomeBinding;
@@ -25,14 +27,68 @@ import com.simple.container.services.pulseServer;
 import com.simple.container.services.startProot;
 import com.simple.container.services.virglServer;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.text.DecimalFormat;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+class status{
+    int code;
+    String name;
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getRun() {
+        return run;
+    }
+
+    public void setRun(int run) {
+        this.run = run;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    int run;
+    String size;
+
+    public status(int code, String name, int run, String size){
+        this.code=code;
+        this.name=name;
+        this.run=run;
+        this.size=size;
+    }
+}
+
 
 public class HomeFragment extends Fragment {
 
@@ -60,12 +116,61 @@ public class HomeFragment extends Fragment {
         Activity activity = requireActivity();
         String privateDir = activity.getFilesDir().getAbsolutePath();
 
+        TextView test_size=binding.cSpaceText;
+
 // 真正创建容器
         Button createButton=binding.create;
         File container_test = new File(privateDir+"/test");
+        System.out.println("json00");
         if(container_test.exists() && container_test.isDirectory()){
             createBtn=false;
             createButton.setEnabled(createBtn);
+
+            Gson gson=new Gson();
+            File file=new File(privateDir,"status.json");
+            System.out.println("计算000");
+           try {
+            BufferedReader bufferedReader=new BufferedReader(new FileReader(file));
+            status st=gson.fromJson(bufferedReader, status.class);
+                bufferedReader.close();
+               System.out.println("计算001");
+                   st.setCode(1);
+                   System.out.println("计算000");
+                   new Thread(()->{
+                       try {
+                           System.out.println("计算0");
+                           st.setSize(count_container_size(privateDir + "/test"));
+                           FileWriter fileWriter=new FileWriter(file);
+                           gson.toJson(st,fileWriter);
+                           st.setCode(0);
+                           fileWriter.close();
+                       } catch (IOException e) {
+                           throw new RuntimeException(e);
+                       }
+                   }).start();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            new Thread(()->{
+                    while(true){
+                        try {
+                            BufferedReader bufferedReader=new BufferedReader(new FileReader(file));
+                            status st=gson.fromJson(bufferedReader, status.class);
+                            bufferedReader.close();
+                            getActivity().runOnUiThread(() -> {
+                            test_size.setText(st.size);
+                            });
+                            sleep(5000);
+                        } catch (InterruptedException | IOException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                    }
+            }).start();
+
+
+            //test_size.setText(count_container_size(privateDir+"/test"));
         }else {
             createButton.setOnClickListener(view -> {
                 String fileUrl = "https://github.com/yu-zify/simple_rootfs/releases/download/rootfs/debian_xfce.tar.gz";
@@ -106,6 +211,17 @@ public class HomeFragment extends Fragment {
                                     installRootfs(dialog);
                                 });
                                 executor.shutdown();
+
+                                Gson gson=new Gson();
+                                File file=new File(privateDir,"status.json");
+                                try {
+                                    FileWriter fileWriter = new FileWriter(file);
+                                    status st2 = new status(0, "test", 1, "1999");
+                                    gson.toJson(st2, fileWriter);
+                                    fileWriter.close();
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
                             } else {
                                 System.out.println("文件不存在");
 
@@ -120,7 +236,7 @@ public class HomeFragment extends Fragment {
 
         Button startButton=binding.start;
         startButton.setEnabled(startBtn);
-        if(startBtn)
+        if(!startBtn)
         startButton.setText("正在运行");
         startButton.setOnClickListener(view -> {
             startBtn=false;
@@ -130,6 +246,9 @@ public class HomeFragment extends Fragment {
             Intent intent = new Intent(requireActivity(), startProot.class);
             intent.putExtra("key1", cmd);
             requireActivity().startService(intent);
+            getActivity().runOnUiThread(() -> {
+                startButton.setText("正在运行");
+            });
 
         });
 
@@ -293,8 +412,10 @@ public class HomeFragment extends Fragment {
     public String count_container_size(String container_home){
         File f=new File(container_home);
         long size;
+        System.out.println("计算");
         size=getFolderSize(f);
-        return String.valueOf(size);
+        DecimalFormat df = new DecimalFormat("#.00");
+        return df.format(size / (1024.0 * 1024 * 1024)) + "G";
     }
 
     public long getFolderSize(File rootfs){
@@ -305,11 +426,16 @@ public class HomeFragment extends Fragment {
             if (files != null) {
                 for (File file : files) {
                     // 如果是文件，累加其大小
-                    if (file.isFile()) {
-                        size += file.length();
-                    } else if (file.isDirectory()) {
-                        // 如果是目录，递归调用
-                        size += getFolderSize(file);
+                    System.out.println(file);
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        Path path=file.toPath();
+                        if (file.isFile() && !Files.isSymbolicLink(path)) {
+                            size += file.length();
+                        }else if (file.isDirectory() && !Files.isSymbolicLink(path)) {
+                            // 如果是目录，递归调用
+                            size += getFolderSize(file);
+                        }
+
                     }
                 }
             }

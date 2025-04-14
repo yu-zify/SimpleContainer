@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void firstSet(String okFilePath){
         try {
-            String[] files = {"core","start.sh","busybox","libbusybox.so.1.36.1","install.sh"};
+            String[] files = {"core","start.sh","busybox","debug.sh","set.sh","install.sh"};
             AssetManager assetManager = getAssets();
             String[] fil = assetManager.list("");
             //System.out.println(fil);
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
                 fileNames.add(file);
                 System.out.println(file);
             }
-            // System.out.println(files+"&&&&&&&&&&&&&&&&&&&&&");
+         // System.out.println(files+"&&&&&&&&&&&&&&&&&&&&&");
             for(String f :files) {
                 String path = getFilesDir().getAbsolutePath() + "/" + f;
                 File file = new File(path);
@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
                 in.close();
                 out.flush();
                 out.close();
-
+                System.out.println("firstfirst");
                 String privateDir = getFilesDir().getAbsolutePath();
                 RunCmd.runcmd(privateDir+"/install.sh 1");
 
